@@ -83,8 +83,28 @@ int main(int argc, char* argv[]) {
         // Runs every frame regardless of events, so the snake keeps moving
         // on its own even when no key is being pressed
         if(SDL_GetTicks() - lastMoveTime > MOVE_DELAY) {
-                SDL_Point oldHead = snakeBody.front();
-                SDL_Point newHead = {oldHead.x + dirX, oldHead.y + dirY};
+            SDL_Point oldHead = snakeBody.front();
+            SDL_Point newHead = {oldHead.x + dirX, oldHead.y + dirY};
+           
+            // Check for self-collision: if the new head position matches any segment of the snake's body, we end the game
+            bool selfCollision = false;
+            for(const SDL_Point& segment : snakeBody) {
+                if(segment.x == newHead.x && segment.y == newHead.y) {
+                    selfCollision = true;
+                    break;
+                }
+            }
+            
+            // Check for wall collision: if the new head position is outside the grid boundaries, we end the game
+            bool wallCollision = (newHead.x < 0 || newHead.x >= 40 || newHead.y < 0 || newHead.y >= 30);
+           
+            // If either collision occurs, we stop the game loop
+            if(selfCollision || wallCollision) {
+                running = false;
+            }
+
+            // If no collision, we add the new head to the front of the deque
+            else{
                 snakeBody.push_front(newHead);
                 if(newHead.x == food.x && newHead.y == food.y) {
                     // If the snake eats the food, we generate a new food position
@@ -94,8 +114,10 @@ int main(int argc, char* argv[]) {
                     // If the snake doesn't eat the food, we pop the tail to keep the length constant
                     snakeBody.pop_back();
                 }
-                lastMoveTime = SDL_GetTicks();
             }
+
+            lastMoveTime = SDL_GetTicks();
+        }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
