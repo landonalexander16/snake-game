@@ -65,16 +65,24 @@ int main(int argc, char* argv[]) {
             if(event.type == SDL_KEYDOWN) {
                 switch(event.key.keysym.sym) {
                     case SDLK_UP:
-                        dirX = 0; dirY = -1;
+                        if(!(dirX == 0 && dirY == 1)) {
+                            dirX = 0; dirY = -1;
+                        }
                         break;
                     case SDLK_DOWN:
-                        dirX = 0; dirY = 1;
+                        if(!(dirX == 0 && dirY == -1)) {
+                            dirX = 0; dirY = 1;
+                        }
                         break;
                     case SDLK_LEFT:
-                        dirX = -1; dirY = 0;
+                        if(!(dirX == 1 && dirY == 0)) {
+                            dirX = -1; dirY = 0;
+                        }
                         break;
                     case SDLK_RIGHT:
-                        dirX = 1; dirY = 0;
+                        if(!(dirX == -1 && dirY == 0)) {
+                            dirX = 1; dirY = 0;
+                        }
                         break;
                 }
             }
