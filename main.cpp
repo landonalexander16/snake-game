@@ -1,5 +1,6 @@
 
 #include <SDL2/SDL.h>
+#include <deque>
 
 int main(int argc, char* argv[]) {
 
@@ -32,10 +33,8 @@ int main(int argc, char* argv[]) {
 
     // Snake's position is tracked in grid coordinates, not pixels, so movement
     // is just +/-1 per tick; pixel values are only computed when drawing
-    int gridX = 5;
-    int gridY = 5;
-    int pixelX = gridX * CELL_SIZE;
-    int pixelY = gridY * CELL_SIZE;
+    std::deque<SDL_Point> snakeBody;
+    snakeBody.push_back({5, 5}); //starting head position
 
     // Direction is a delta applied to gridX/gridY each tick; (1,0) = moving right
     int dirX = 1;
@@ -43,7 +42,6 @@ int main(int argc, char* argv[]) {
 
     bool running = true;
     SDL_Event event;
-    SDL_Rect snakeRect = { pixelX, pixelY, CELL_SIZE, CELL_SIZE }; // Initial position and size of the snake
    
     // Tracks when the snake last moved, so movement speed is decoupled from
     // the render loop's frame rate (otherwise the snake would move hundreds of times per second)
@@ -80,20 +78,22 @@ int main(int argc, char* argv[]) {
         // Runs every frame regardless of events, so the snake keeps moving
         // on its own even when no key is being pressed
         if(SDL_GetTicks() - lastMoveTime > MOVE_DELAY) {
-                gridX += dirX;
-                gridY += dirY;
-                pixelX = gridX * CELL_SIZE;
-                pixelY = gridY * CELL_SIZE;
-                snakeRect.x = pixelX;
-                snakeRect.y = pixelY;
+                SDL_Point oldHead = snakeBody.front();
+                SDL_Point newHead = {oldHead.x + dirX, oldHead.y + dirY};
+                snakeBody.push_front(newHead);
+                snakeBody.pop_back();
                 lastMoveTime = SDL_GetTicks();
             }
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderFillRect(renderer, &snakeRect);
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color for the snake
+        // Draw each segment of the snake
+        for(const SDL_Point& segment : snakeBody) {
+            SDL_Rect segmentRect = { segment.x * CELL_SIZE, segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE };
+            SDL_RenderFillRect(renderer, &segmentRect);
+        }
 
         SDL_RenderPresent(renderer);
     }
