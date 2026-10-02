@@ -1,6 +1,8 @@
 
 #include <SDL2/SDL.h>
 #include <deque>
+#include <cstdlib>
+#include <ctime>
 
 int main(int argc, char* argv[]) {
 
@@ -50,6 +52,8 @@ int main(int argc, char* argv[]) {
 
     SDL_Point food = {15, 10}; // pick any starting grid position
 
+    srand(time(nullptr)); // Initialize random seed
+
     while (running) {
         // Drain all pending events this frame; multiple can queue up between frames
         while (SDL_PollEvent(&event)) {
@@ -81,11 +85,13 @@ int main(int argc, char* argv[]) {
         if(SDL_GetTicks() - lastMoveTime > MOVE_DELAY) {
                 SDL_Point oldHead = snakeBody.front();
                 SDL_Point newHead = {oldHead.x + dirX, oldHead.y + dirY};
+                snakeBody.push_front(newHead);
                 if(newHead.x == food.x && newHead.y == food.y) {
-                    snakeBody.push_front(newHead);
+                    // If the snake eats the food, we generate a new food position
+                    food.x = rand() % 40; // 800 / CELL_SIZE = 40
+                    food.y = rand() % 30; // 600 / CELL_SIZE = 30
                 } else {
                     // If the snake doesn't eat the food, we pop the tail to keep the length constant
-                    snakeBody.push_front(newHead);
                     snakeBody.pop_back();
                 }
                 lastMoveTime = SDL_GetTicks();
