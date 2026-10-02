@@ -2,13 +2,16 @@
 #include <SDL2/SDL.h>
 
 int main(int argc, char* argv[]) {
-    // Initializes SDL
+
+    const int CELL_SIZE = 20; // All grid math (movement, position, collision) is based on this unit, not raw pixels
+
+    // SDL must be initialized before any other SDL function call will work
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
         return 1;
     }
 
-    // Creates a window
+    // Window size is 800x600 -> with CELL_SIZE 20, this gives a 40x30 grid
     SDL_Window* window = SDL_CreateWindow("Snake Emulator",
                                          SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                          800, 600, SDL_WINDOW_SHOWN);
@@ -18,7 +21,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Creates a renderer
+    // -1 lets SDL pick the first available rendering driver automatically
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(!renderer) {
         SDL_Log("Could not create renderer: %s", SDL_GetError());
@@ -27,34 +30,74 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    //Main loop
+    // Snake's position is tracked in grid coordinates, not pixels, so movement
+    // is just +/-1 per tick; pixel values are only computed when drawing
+    int gridX = 5;
+    int gridY = 5;
+    int pixelX = gridX * CELL_SIZE;
+    int pixelY = gridY * CELL_SIZE;
+
+    // Direction is a delta applied to gridX/gridY each tick; (1,0) = moving right
+    int dirX = 1;
+    int dirY = 0;
+
     bool running = true;
     SDL_Event event;
-    SDL_Rect snakeRect = { 100, 100, 20, 20 }; // Initial position and size of the snake
+    SDL_Rect snakeRect = { pixelX, pixelY, CELL_SIZE, CELL_SIZE }; // Initial position and size of the snake
+   
+    // Tracks when the snake last moved, so movement speed is decoupled from
+    // the render loop's frame rate (otherwise the snake would move hundreds of times per second)
+    Uint32 lastMoveTime = SDL_GetTicks();
+    const int MOVE_DELAY = 200; /// ms between moves; lower = faster snake
+
 
     while (running) {
-        // Event handling
+        // Drain all pending events this frame; multiple can queue up between frames
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = false;
             }
+            // Arrow keys only change direction; actual movement is handled
+            // separately below, gated by MOVE_DELAY
+            if(event.type == SDL_KEYDOWN) {
+                switch(event.key.keysym.sym) {
+                    case SDLK_UP:
+                        dirX = 0; dirY = -1;
+                        break;
+                    case SDLK_DOWN:
+                        dirX = 0; dirY = 1;
+                        break;
+                    case SDLK_LEFT:
+                        dirX = -1; dirY = 0;
+                        break;
+                    case SDLK_RIGHT:
+                        dirX = 1; dirY = 0;
+                        break;
+                }
+            }
         }
 
-        // Clear the screen
+        // Runs every frame regardless of events, so the snake keeps moving
+        // on its own even when no key is being pressed
+        if(SDL_GetTicks() - lastMoveTime > MOVE_DELAY) {
+                gridX += dirX;
+                gridY += dirY;
+                pixelX = gridX * CELL_SIZE;
+                pixelY = gridY * CELL_SIZE;
+                snakeRect.x = pixelX;
+                snakeRect.y = pixelY;
+                lastMoveTime = SDL_GetTicks();
+            }
+
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // Render game objects here
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
         SDL_RenderFillRect(renderer, &snakeRect);
 
-        // Present the rendered frame
         SDL_RenderPresent(renderer);
-
-        
     }
 
-    // Cleanup
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
