@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
     //Main loop
     bool running = true;
     SDL_Event event;
+    SDL_Rect snakeRect = { 100, 100, 20, 20 }; // Initial position and size of the snake
 
     while (running) {
         // Event handling
@@ -44,6 +45,8 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
 
         // Render game objects here
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderFillRect(renderer, &snakeRect);
 
         // Present the rendered frame
         SDL_RenderPresent(renderer);
