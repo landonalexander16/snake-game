@@ -48,6 +48,7 @@ int main(int argc, char* argv[]) {
     Uint32 lastMoveTime = SDL_GetTicks();
     const int MOVE_DELAY = 200; /// ms between moves; lower = faster snake
 
+    SDL_Point food = {15, 10}; // pick any starting grid position
 
     while (running) {
         // Drain all pending events this frame; multiple can queue up between frames
@@ -80,8 +81,13 @@ int main(int argc, char* argv[]) {
         if(SDL_GetTicks() - lastMoveTime > MOVE_DELAY) {
                 SDL_Point oldHead = snakeBody.front();
                 SDL_Point newHead = {oldHead.x + dirX, oldHead.y + dirY};
-                snakeBody.push_front(newHead);
-                snakeBody.pop_back();
+                if(newHead.x == food.x && newHead.y == food.y) {
+                    snakeBody.push_front(newHead);
+                } else {
+                    // If the snake doesn't eat the food, we pop the tail to keep the length constant
+                    snakeBody.push_front(newHead);
+                    snakeBody.pop_back();
+                }
                 lastMoveTime = SDL_GetTicks();
             }
 
@@ -94,6 +100,11 @@ int main(int argc, char* argv[]) {
             SDL_Rect segmentRect = { segment.x * CELL_SIZE, segment.y * CELL_SIZE, CELL_SIZE, CELL_SIZE };
             SDL_RenderFillRect(renderer, &segmentRect);
         }
+
+        // Draw the food
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red color for the food
+        SDL_Rect foodRect = { food.x * CELL_SIZE, food.y * CELL_SIZE, CELL_SIZE, CELL_SIZE };
+        SDL_RenderFillRect(renderer, &foodRect);
 
         SDL_RenderPresent(renderer);
     }
