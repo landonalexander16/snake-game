@@ -26,4 +26,35 @@ int main(int argc, char* argv[]) {
         SDL_Quit();
         return 1;
     }
+
+    //Main loop
+    bool running = true;
+    SDL_Event event;
+
+    while (running) {
+        // Event handling
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            }
+        }
+
+        // Clear the screen
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        // Render game objects here
+
+        // Present the rendered frame
+        SDL_RenderPresent(renderer);
+
+        
+    }
+
+    // Cleanup
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return 0;
 }
