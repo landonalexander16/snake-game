@@ -15,16 +15,20 @@ A classic Snake game built in C++ using SDL2, developed as a portfolio project t
 This project requires a C++ compiler (MinGW-w64/MSYS2 recommended on Windows) and SDL2.
 
 1. Install SDL2 for your toolchain. On MSYS2 (UCRT64):
+   
 pacman -S mingw-w64-ucrt-x86_64-SDL2
 
 2. Clone the repo:
+
 git clone https://github.com/lalexander16/snake-game.git
 cd snake-game
 
 3. Compile:
+
 g++ main.cpp -o snake.exe -IC:/msys64/ucrt64/include/SDL2 -Dmain=SDL_main -LC:/msys64/ucrt64/lib -lmingw32 -mwindows -lSDL2main -lSDL2
 
 4. Run:
+
 ./snake.exe
 
 
