@@ -44,6 +44,10 @@ This project requires a C++ compiler (MinGW-w64/MSYS2 recommended on Windows) an
 - **Timing**: movement speed is controlled independently of the render loop's frame rate using `SDL_GetTicks()`, so the game runs at a consistent pace rather than moving as fast as the hardware allows.
 - **Collision handling**: both wall and self-collision are checked *before* committing a move, so invalid moves never corrupt game state.
 
+## Demo Video
+
+https://github.com/user-attachments/assets/59e94d51-3051-4360-aa4e-16dbd4e51fa5
+
 ## Planned Features
 
 - On-screen score display (likely via SDL_ttf for text rendering)
