@@ -16,20 +16,20 @@ This project requires a C++ compiler (MinGW-w64/MSYS2 recommended on Windows) an
 
 1. Install SDL2 for your toolchain. On MSYS2 (UCRT64):
    
-pacman -S mingw-w64-ucrt-x86_64-SDL2
+   pacman -S mingw-w64-ucrt-x86_64-SDL2
 
 2. Clone the repo:
 
-git clone https://github.com/lalexander16/snake-game.git
-cd snake-game
+   git clone https://github.com/lalexander16/snake-game.git
+   cd snake-game
 
 3. Compile:
 
-g++ main.cpp -o snake.exe -IC:/msys64/ucrt64/include/SDL2 -Dmain=SDL_main -LC:/msys64/ucrt64/lib -lmingw32 -mwindows -lSDL2main -lSDL2
+   g++ main.cpp -o snake.exe -IC:/msys64/ucrt64/include/SDL2 -Dmain=SDL_main -  LC:/msys64/ucrt64/lib -lmingw32 -mwindows -lSDL2main -lSDL2
 
 4. Run:
 
-./snake.exe
+   ./snake.exe
 
 
 ## Controls
